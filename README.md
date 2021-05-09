@@ -1,5 +1,5 @@
 # Database-Administration
-Database Administration – Project Requirements
+Database Administration – Project
 
 ============================== Part 1 – The Physical Schema ==============================
 1. Chose a database application that is of interest for you. It must use Oracle as the database
