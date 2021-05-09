@@ -1,7 +1,7 @@
 # Database-Administration
 Database Administration – Project
 
-============================== Part 1 – The Physical Schema ==============================
+========================= Part 1 – The Physical Schema =========================
 1. Chose a database application that is of interest for you. It must use Oracle as the database
 server. You should have minimum 5-6 tables.
 
@@ -28,7 +28,7 @@ possible the physical schema.
    The segment types (there might be more than just tables and indexes)
 
 
-============================== Part 2 – Performance Tuning ==============================
+========================= Part 2 – Performance Tuning =========================
 1. Implement a script for inserting data into the tables. At least one table should have hundreds of
 thousands of rows (>100000) (you can use PL/SQL logic to do it).
 
@@ -44,7 +44,7 @@ Pay attention to:
    Optimization technique (indexes, restructuring of the SQL query)
 
 
-============================== Part 3 – Security and Audit ==============================
+========================= Part 3 – Security and Audit =========================
 1. Implement the security component of the application at the database level. Identify for your
 application the main user types, the privileges they need (write/read on specific tables), etc. For 
 each category create an Oracle role and grant the necessary privileges. Create at least one user
@@ -55,7 +55,7 @@ proves that the privileges work for each role.
 want to audit, why and the solution. Prove that the solution works by writing a test scenario.
 
 
-============================== Part 4 – Backup & Recovery ==============================
+========================= Part 4 – Backup & Recovery =========================
 1. Design a backup and recovery strategy for the database. The strategy must contain RPO and
 RTO requirements and a description of the way these requirements are met.
 2. Create a script that does the backup and then imagine a "crash" scenario with the necessary
