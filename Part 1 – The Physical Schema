@@ -1,0 +1,90 @@
+1. ========== Create the user "project" ==========
+create user proiect identified by proiect;
+
+2. ========== We offer rights ==========
+grant create session, create table, create sequence, create view, create procedure, create cluster to proiect;
+grant unlimited tablespace to proiect;
+grant alter any cluster to proiect;
+
+3. ========== CDatabase connection ==========
+conn proiect/proiect@localhost:1521/mydb
+sqlplus / as sysdba > sqldeveloper.sh
+
+4. ========== Create tablespaces ==========
+create tablespace tablespace_tables datafile '/u01/app/oracle/oradata/MYDB/datafile/tablespace_tables.dbf' size 300M autoextend on next 50M maxsize 500M;
+create tablespace tablespace_index datafile '/u01/app/oracle/oradata/MYDB/datafile/tablespace_index.dbf' size 300M autoextend on next 50M maxsize 500M;
+create tablespace tablespace_university datafile '/u01/app/oracle/oradata/MYDB/datafile/tablespace_university.dbf' size 300M autoextend on next 50M maxsize 500M;
+create tablespace tablespace_fiction datafile '/u01/app/oracle/oradata/MYDB/datafile/tablespace_fiction.dbf' size 300M autoextend on next 50M maxsize 500M;
+create tablespace tablespace_others datafile '/u01/app/oracle/oradata/MYDB/datafile/tablespace_others.dbf' size 300M autoextend on next 50M maxsize 500M;
+
+5. ========== Create database tables ==========
+CREATE CLUSTER book_author (author_id number(5))
+	SIZE 1024
+	TABLESPACE tablespace_tables
+	STORAGE (INITIAL 50M NEXT 5M);
+
+CREATE TABLE authors(
+	author_id number(5) NOT NULL,
+	author_name varchar(30) NOT NULL,
+	author_surname varchar(30) NOT NULL,
+	author_birthday varchar(30),
+	CONSTRAINT pk_authors PRIMARY KEY (author_id)
+	)
+	CLUSTER book_author (author_id);
+
+CREATE TABLE books(
+	book_id number(5) NOT NULL,
+	book_name varchar(100) NOT NULL,
+	author_id number(5) NOT NULL,
+	book_category varchar(15),
+	ISBN varchar(13),
+ 	appearance_year number(4),
+	CONSTRAINT pk_books PRIMARY KEY (book_id),
+	CONSTRAINT fk_authors FOREIGN KEY (author_id) REFERENCES authors (author_id)
+	--CONSTRAINT fk_authors FOREIGN KEY (author_id) REFERENCES authors (author_id)
+	)
+	CLUSTER book_author (author_id)
+	PARTITION BY LIST(book_category)(
+		PARTITION university_books VALUES ('university') TABLESPACE tablespace_university,
+		PARTITION fiction_books VALUES ('fiction') TABLESPACE tablespace_fiction,
+		PARTITION other_books VALUES ('other') TABLESPACE tablespace_others
+		);
+
+CREATE INDEX book_author_index
+ON CLUSTER book_author
+TABLESPACE tablespace_index
+STORAGE (INITIAL 5M NEXT 50M)
+
+CREATE TABLE students(
+	student_id number(5) NOT NULL,
+	student_name varchar(30) NOT NULL,
+	student_surname varchar(30) NOT NULL,
+	student_adress varchar(100),
+	CONSTRAINT pk_students PRIMARY KEY (student_id)
+	)
+	TABLESPACE tablespace_tables;
+
+CREATE TABLE librarians(
+	librarian_id number(5) NOT NULL,
+	librarian_name varchar(30) NOT NULL,
+	librarian_surname varchar(30) NOT NULL,
+	CONSTRAINT pk_librarians PRIMARY KEY (librarian_id)
+	)
+	TABLESPACE tablespace_tables;
+
+CREATE TABLE borrows(
+	borrow_id number(5) NOT NULL,
+	student_id number(5) NOT NULL,
+	librarian_id number(5) NOT NULL,
+	book_id number(5) NOT NULL,
+	taken_date date NOT NULL,
+	brought_date date NOT NULL,
+	CONSTRAINT pk_borrows PRIMARY KEY (borrow_id),
+	CONSTRAINT fk_students FOREIGN KEY (student_id) REFERENCES students(student_id),
+	CONSTRAINT fk_librarians FOREIGN KEY (librarian_id) REFERENCES librarians(librarian_id)
+	)
+	TABLESPACE tablespace_tables
+	STORAGE (BUFFER_POOL KEEP);
+
+========== Eseful commands ==========
+1. Display all tablespaces: login with user + command: select file_name from dba_data_files;
