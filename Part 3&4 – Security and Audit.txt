@@ -1,0 +1,111 @@
+-- ==========================================================
+-- ======================== SECURITY ========================
+-- ==========================================================
+
+-- ======================== CREATE ROLES ========================
+-- ======================== 1. Administrator ======================== 
+create role library_administrator;
+grant connect to library_administrator;
+
+grant select, insert, update, delete on authors to library_administrator;
+grant select, insert, update, delete on books to library_administrator;
+grant select, insert, update, delete on borrows to library_administrator;
+grant select, insert, update, delete on librarians to library_administrator;
+grant select, insert, update, delete on students to library_administrator;
+
+create user library_administrator identified by library_administrator;
+grant library_administrator to library_administrator;
+
+-- ======================== 2. Librarian ======================== 
+create role librarian;
+grant connect to librarian;
+
+grant select, insert, update, delete on authors to librarian;
+grant select, insert, update, delete on books to librarian;
+grant select, insert, update, delete on borrows to librarian;
+grant select on librarians to librarian;
+grant select, insert, update, delete on students to librarian;
+
+create user librarian identified by librarian;
+grant librarian to librarian;
+
+-- ======================== 3. Student ======================== 
+create role student;
+grant connect to student;
+
+grant select on authors to student;
+grant select on books to student;
+grant select on borrows to student;
+
+create user student identified by student;
+grant student to student;
+
+-- ======================== USEFULL COMMANDS ======================== 
+select * from user_sys_privs;
+select * from dba_roles;
+[POZA]
+
+-- =======================================================
+-- ======================== AUDIT ========================
+-- =======================================================
+audit insert on borrows by access whenever not successfull;
+insert into borrows value ('1', '1005', '7');
+
+audit insert on borrows by access whenever not successful;
+insert into borrows (borrow_id, student_id, librarian_id) values (1, '1005', '7');
+
+audit update on librarians by access;
+select * from librarians;
+update librarians set librarian_name = 'Updated librarian name' where librarian_id = 298;
+select * from librarians;
+
+audit delete on authors by access whenever successful;
+select * from authors;
+delete from authors where author_id = 2487;
+select * from authors;
+
+audit delete on books by access whenever not successful;
+delete from books where books_id = "invalid_id_123";
+
+-- ======================== USEFULL COMMANDS ======================== 
+select user_name, audit_option, success, failure from dba_stmt_audit_opts;
+select user_name, timestamp, owner, obj_name, action_name from dba_audit_trail;
+
+
+-- =======================================================
+-- ======================= BACKUP ========================
+-- =======================================================
+
+[POZA]
+1. alter system set archive_log_target = 7200;
+2. configure retention policy to redundancy 5;
+3. delete obsolete redundancy 5;
+4. show retention policy
+
+1. rman target/
+2. configure controlfile autobackup on;
+3. backup as compressed backupset database include current controlfile plus archivelog format '/home/oracle/backup/%U';
+
+
+-- =======================================================
+-- ======================== CRASH ========================
+-- =======================================================
+
+
+rm /u01/app/oracle/oradata/MYDB/datafile/borrows.dbf
+
+1. startup nomount
+2. rman target /
+3. restore controlfile from autobackup;
+4. alter database mount;
+5. restore database;
+6. recove database;
+7. alter database open resetlogs;
+
+
+
+
+
+
+
+
